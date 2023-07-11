@@ -40,6 +40,18 @@ public class HandlingBall : MonoBehaviour
             ball.transform.position = transform.position;
             ballsInHand.Enqueue(ball);
             handMode = true;
+
+            if (catchingMode)
+            {
+                print("ssfsf: " + ballsInHand.Count);
+                StopAllCoroutines();
+                if (ballsInHand.Count == myBalls.Count)
+                {
+                    ToggleGrandParentScript();
+                    catchingMode = false;
+                }
+
+            }
         }
     }
 
@@ -66,16 +78,6 @@ public class HandlingBall : MonoBehaviour
             foreach(GameObject ballInHand in ballsInHand)
             {
                 ballInHand.transform.position = transform.position;
-            }
-            if(catchingMode)
-            {
-                StopAllCoroutines();
-                if(ballsInHand.Count == myBalls.Count)
-                {
-                    ToggleGrandParentScript();
-                    catchingMode = false;
-                }
-               
             }
         }
     }
@@ -121,7 +123,6 @@ public class HandlingBall : MonoBehaviour
             int index = int.Parse(ball.name);
             ballRb = allBallsRbs[index-1];
             //ballRb = ball.GetComponent<Rigidbody>();
-            print("Now: " + ball.name);
         }
         else
         {

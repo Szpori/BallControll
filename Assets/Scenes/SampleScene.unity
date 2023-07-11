@@ -6811,8 +6811,8 @@ MonoBehaviour:
   patternType: 
   cosScale: 3
   offset: 0
-  ballsInPattern: 6
-  patternSpeed: 2
+  ballsInPattern: 5
+  patternSpeed: 1.5
   basicVector: {x: 0, y: 0, z: 0}
   basicOddPatternVector: {x: 0, y: 10.7, z: -0.09}
   basicEvenPatternVector: {x: 0, y: 7.1, z: 0.47}
