@@ -223,9 +223,15 @@ public class PatternManager : MonoBehaviour
             balls[i].gameObject.SetActive(true);
 
             if (i % 2 == 0)
+            {
                 leftHand.myBalls.Add(balls[i]);
+                leftHand.ballsInHand.Enqueue(balls[i]);
+            }
             else
+            {
                 rightHand.myBalls.Add(balls[i]);
+                rightHand.ballsInHand.Enqueue(balls[i]);
+            }
 
             leftHand.allBalls.Add(balls[i]);
             rightHand.allBalls.Add(balls[i]);

@@ -5,6 +5,7 @@ using UnityEngine;
 public class HandlingBall : MonoBehaviour
 {
 
+    public Queue<GameObject> ballsInHand = new Queue<GameObject>();
     public List<GameObject> myBalls = new List<GameObject>();
     public List<GameObject> allBalls = new List<GameObject>();
     public List<Rigidbody> allBallsRbs = new List<Rigidbody>();
@@ -22,6 +23,7 @@ public class HandlingBall : MonoBehaviour
     public float initialDelay = 2f;
     public float patternTime = 1f;
 
+    public bool catchingMode = false;
     public bool handMode = true;
     int numOfBalls;
     int ballNum = 0;
@@ -29,13 +31,14 @@ public class HandlingBall : MonoBehaviour
     private void OnTriggerEnter(Collider obj)
     {
 
-        if (obj.gameObject != ball && obj.gameObject.tag == "Ball")
+        if (!ballsInHand.Contains(obj.gameObject) && obj.gameObject.tag == "Ball")
         {
             ball = obj.gameObject;
             int index = int.Parse(ball.name);
             ballRb = allBallsRbs[index-1];
             catchPos = ball.transform.position;
             ball.transform.position = transform.position;
+            ballsInHand.Enqueue(ball);
             handMode = true;
         }
     }
@@ -60,7 +63,35 @@ public class HandlingBall : MonoBehaviour
 
         if(handMode)
         {
-            ball.transform.position = transform.position;
+            foreach(GameObject ballInHand in ballsInHand)
+            {
+                ballInHand.transform.position = transform.position;
+            }
+            if(catchingMode)
+            {
+                StopAllCoroutines();
+                if(ballsInHand.Count == myBalls.Count)
+                {
+                    ToggleGrandParentScript();
+                    catchingMode = false;
+                }
+               
+            }
+        }
+    }
+
+    private void ToggleGrandParentScript()
+    {
+        Transform grandparent = transform.parent.parent; // Get the grandparent object
+
+        if (grandparent != null)
+        {
+            MonoBehaviour grandparentScript = grandparent.GetComponent<MonoBehaviour>(); // Get the script on the grandparent
+
+            if (grandparentScript != null)
+            {
+                grandparentScript.enabled = !grandparentScript.enabled;
+            }
         }
     }
 
@@ -77,6 +108,7 @@ public class HandlingBall : MonoBehaviour
     private void Relase()
     {
         float scale = ball.transform.position.y - basicPos.y;
+        ballsInHand.Dequeue();
         // branie poprawki na nakładający się błąd numeryczny timingu
         Vector3 fixedVetor = new Vector3(properVector.x, properVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)), properVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ)));
         // wyliczanie w wektor pewnego losowego procentowego błądu
