@@ -102,6 +102,13 @@ public class PatternManager : MonoBehaviour
     [SerializeField] HandlingBall rightHand;
     bool evenPattern = false;
 
+    public bool timeScaleSpeed = false;
+    [SerializeField] float speedUpTimeInterval = 1f;
+
+    public string scriptName = "HandlingBall"; // Name of the script you want to turn on/off
+    public float preJuggDelay = 1f; // Delay in seconds
+    public float jugglingTime = 3f;
+
     private void Awake()
     {
 
@@ -246,10 +253,41 @@ public class PatternManager : MonoBehaviour
     void Start()
     {
         Time.timeScale = timeScale;
+        Invoke("StartJuggling", preJuggDelay);
+    }
+
+    private void IncreaseTimeScale()
+    {
+        timeScale += 0.05f;
+        Time.timeScale = timeScale;
     }
 
     private void Update()
     {
         numOfCollision = NUM_OF_COLLISON/2;
+    }
+
+
+    private void ToggleCatchingMode()
+    {
+        HandlingBall[] scripts = FindObjectsOfType<HandlingBall>(); // Find all MonoBehaviours in the scene
+
+        foreach (HandlingBall script in scripts)
+        {
+            script.catchingMode = !script.catchingMode;
+        }
+    }
+
+    private void StartJuggling()
+    {
+        MonoBehaviour[] scripts = FindObjectsOfType<RotationPattern>(); // Find all MonoBehaviours in the scene
+
+        foreach (MonoBehaviour script in scripts)
+        {
+            script.enabled = !script.enabled;
+        }
+
+        Invoke("ToggleCatchingMode", jugglingTime);
+        InvokeRepeating("IncreaseTimeScale", speedUpTimeInterval, speedUpTimeInterval);
     }
 }

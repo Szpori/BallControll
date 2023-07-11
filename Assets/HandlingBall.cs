@@ -110,6 +110,7 @@ public class HandlingBall : MonoBehaviour
     private void Relase()
     {
         float scale = ball.transform.position.y - basicPos.y;
+        float scaleZ = ball.transform.position.z - basicPos.z;
         ballsInHand.Dequeue();
         // branie poprawki na nakładający się błąd numeryczny timingu
         Vector3 fixedVetor = new Vector3(properVector.x, properVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)), properVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ)));
@@ -129,6 +130,6 @@ public class HandlingBall : MonoBehaviour
             handMode = false;
         }
 
-        StartCoroutine(BallRelease(patternTime / (1+scale) ));
+        StartCoroutine(BallRelease(patternTime / (1+scale+scaleZ) ));
     }
 }
