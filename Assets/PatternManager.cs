@@ -57,6 +57,7 @@ public class PatternManager : MonoBehaviour
 
     // wyskosc = (10.7/2)/9.81 * (10.7/2)/2
     // wyokosc = (10.7/patternSpeed)/9.81 * (10.7/patternSpeed)/2
+    public static bool userControlledMode = false;
 
 
     public static int NUM_OF_COLLISON;
@@ -262,9 +263,22 @@ public class PatternManager : MonoBehaviour
         Time.timeScale = timeScale;
     }
 
-    private void Update()
+    void Update()
     {
-        numOfCollision = NUM_OF_COLLISON/2;
+        numOfCollision = NUM_OF_COLLISON / 2;
+
+        if (Input.GetKeyDown(KeyCode.M)) // Add a key to toggle between modes
+        {
+            userControlledMode = !userControlledMode;
+            if (userControlledMode)
+            {
+                CancelInvoke("StartJuggling");
+            }
+            else
+            {
+                Invoke("StartJuggling", preJuggDelay);
+            }
+        }
     }
 
 

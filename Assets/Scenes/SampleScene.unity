@@ -1222,6 +1222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b958929b4e6ac64996fe3ab31ad72d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  releaseKey: 32
   myBalls: []
   allBalls: []
   allBallsRbs: []
@@ -7184,12 +7185,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numOfCollision: 0
   adjustSimulationSpeed: 1
-  simulationSpeed: 80
+  simulationSpeed: 40
   patternType: 
   cosScale: 3
   offset: 0
-  ballsInPattern: 3
-  patternSpeed: 2
+  ballsInPattern: 5
+  patternSpeed: 2.3
   basicVector: {x: 0, y: 0, z: 0}
   basicOddPatternVector: {x: 0, y: 10.7, z: -0.09}
   basicEvenPatternVector: {x: 0, y: 7.1, z: 0.47}
@@ -7221,7 +7222,7 @@ MonoBehaviour:
   leftHand: {fileID: 2091146062}
   rightHand: {fileID: 698427321}
   timeScaleSpeed: 1
-  speedUpTimeInterval: 1
+  speedUpTimeInterval: 100
   scriptName: HandlingBall
   preJuggDelay: 0
   jugglingTime: 50
@@ -14652,6 +14653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b958929b4e6ac64996fe3ab31ad72d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  releaseKey: 32
   myBalls: []
   allBalls: []
   allBallsRbs: []
