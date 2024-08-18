@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class RotationPattern : MonoBehaviour
 {
     [SerializeField] Transform yVec;
@@ -19,6 +18,8 @@ public class RotationPattern : MonoBehaviour
     public float ROT_Y_TIME = 2f;
     float yTime;
 
+    public bool userControlledRotation = false; // Checkbox to toggle user control over rotation
+
     public float yROT;
 
     Quaternion basicRotation;
@@ -27,7 +28,6 @@ public class RotationPattern : MonoBehaviour
     float patternTime;
 
     private float fixedDeltaTime;
-    int counter = 0;
 
     private void Awake()
     {
@@ -40,7 +40,7 @@ public class RotationPattern : MonoBehaviour
         patternTime = PATTERN_TIME;
         basicRotation = transform.rotation;
 
-        zTime = ROT_Z_TIME/2;
+        zTime = ROT_Z_TIME / 2;
         yTime = ROT_Y_TIME;
 
         if (leftSide)
@@ -48,7 +48,9 @@ public class RotationPattern : MonoBehaviour
             StartCoroutine(hand.BallRelease(hand.initialDelay));
         }
         else
+        {
             StartCoroutine(SetUpTiming());
+        }
     }
 
     // Update is called once per frame
@@ -58,22 +60,23 @@ public class RotationPattern : MonoBehaviour
 
         if (throwMode)
         {
-            TimeRotation();
-            // Cosinus sprawia, że zamiast jakiegoś równległobku/rombu rotacja zatacza elipsę/koło.
-            yVec.Rotate(0f,rotYSpeed * Time.fixedDeltaTime * Mathf.Cos(yTime * PatternManager.COS_SCALE),0f);
-            zVec.Rotate(0f, 0f, rotZSpeed * Time.fixedDeltaTime * Mathf.Cos(zTime * PatternManager.COS_SCALE));
-            transform.rotation = Quaternion.Euler(0f, yVec.rotation.y*100, zVec.rotation.z*100);
-            // Obracanie jednocześnie wokół osi z i y powoduje zmianę w rotacji x, co psuje odpowiednie zapętlanie się rotacji, dlatego
-            // Trzeba osobno obracać jakiś obiekt wokoł osi y, inny wokół osi z i pożadana rotacja będzie po prostu sumą tych dwóch rotacji
+            if (userControlledRotation)
+            {
+                TimeRotation();
+                PerformAutomaticRotation(); // Perform the automatic rotation based on timing
+            }
+            else
+            {
+                HandleManualRotation(); // Handle manual rotation with arrow keys
+            }
         }
-
     }
 
     private void TimeRotation()
     {
         zTime -= Time.fixedDeltaTime;
         yTime -= Time.fixedDeltaTime;
-        // co połowę okresu zmienamy znak danej rotacji na przeciwny
+        // Change rotation direction every half cycle
         if (yTime < 0f)
         {
             rotYSpeed *= -1;
@@ -86,6 +89,31 @@ public class RotationPattern : MonoBehaviour
         }
     }
 
+    private void PerformAutomaticRotation()
+    {
+        // Cosine ensures that instead of a parallelogram/rhombus, the rotation traces an ellipse/circle.
+        yVec.Rotate(0f, rotYSpeed * Time.fixedDeltaTime * Mathf.Cos(yTime * PatternManager.COS_SCALE), 0f);
+        zVec.Rotate(0f, 0f, rotZSpeed * Time.fixedDeltaTime * Mathf.Cos(zTime * PatternManager.COS_SCALE));
+        transform.rotation = Quaternion.Euler(0f, yVec.rotation.y * 100, zVec.rotation.z * 100);
+    }
+
+    private void HandleManualRotation()
+    {
+        // Check for left or right arrow key press
+        if (Input.GetKey(KeyCode.LeftArrow) && !leftSide)
+        {
+            // Simulate automatic rotation for the right hand
+            TimeRotation();
+            PerformAutomaticRotation();
+        }
+        else if (Input.GetKey(KeyCode.RightArrow) && leftSide)
+        {
+            // Simulate automatic rotation for the left hand
+            TimeRotation();
+            PerformAutomaticRotation();
+        }
+    }
+
     public IEnumerator SetUpTiming()
     {
         throwMode = false;
@@ -93,5 +121,4 @@ public class RotationPattern : MonoBehaviour
         throwMode = true;
         StartCoroutine(hand.BallRelease(hand.initialDelay));
     }
-
 }

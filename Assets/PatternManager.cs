@@ -57,7 +57,7 @@ public class PatternManager : MonoBehaviour
 
     // wyskosc = (10.7/2)/9.81 * (10.7/2)/2
     // wyokosc = (10.7/patternSpeed)/9.81 * (10.7/patternSpeed)/2
-    public static bool userControlledMode = false;
+    public static bool userControlledMode = true;
 
 
     public static int NUM_OF_COLLISON;

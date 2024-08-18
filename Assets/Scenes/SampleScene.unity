@@ -7649,6 +7649,8 @@ MonoBehaviour:
   ROT_Z_TIME: 0.7
   rotYSpeed: -30
   ROT_Y_TIME: 0.7
+  userControlledRotation: 0
+  manualRotationSpeed: 50
   yROT: 0
 --- !u!4 &1186828144
 Transform:
@@ -8446,6 +8448,8 @@ MonoBehaviour:
   ROT_Z_TIME: 0.7
   rotYSpeed: -30
   ROT_Y_TIME: 0.7
+  userControlledRotation: 0
+  manualRotationSpeed: 50
   yROT: 0
 --- !u!1 &1596540764
 GameObject:
