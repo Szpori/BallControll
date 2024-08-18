@@ -4,106 +4,92 @@ using UnityEngine;
 
 public class HandlingBall : MonoBehaviour
 {
-    public KeyCode releaseKey; // Release key to be set dynamically
-
+    public KeyCode releaseKey;
     public Queue<GameObject> ballsInHand = new Queue<GameObject>();
     public List<GameObject> myBalls = new List<GameObject>();
-    public List<GameObject> allBalls = new List<GameObject>();
     public List<Rigidbody> allBallsRbs = new List<Rigidbody>();
     [SerializeField] GameObject ball;
     Rigidbody ballRb;
     public Vector3 properVector;
     public float maxErrorZ;
     public float maxErrorY;
-    public Vector3 catchPos;
-    public Vector3 ballVelocity;
-    public Vector3 previousPos;
-    public Vector3 basicPos;
-    public float smallEnoughError = 0.1f;
-
     public float initialDelay = 2f;
     public float patternTime = 1f;
-
     public bool catchingMode = false;
     public bool handMode = true;
-    int numOfBalls;
-    int ballNum = 0;
+
+    Vector3 basicPos;
 
     void Start()
     {
-        // Set the release key based on the hand object
-        if (gameObject.name == "LeftHand") // Replace with your left hand object name
-        {
-            releaseKey = KeyCode.D;
-        }
-        else if (gameObject.name == "RightHand") // Replace with your right hand object name
-        {
-            releaseKey = KeyCode.A;
-        }
-        else
-        {
-            Debug.LogError("Hand object name not recognized. Please set the release key manually.");
-        }
+        releaseKey = (gameObject.name == "LeftHand") ? KeyCode.D : KeyCode.A;
+        InitializeBallRigidbodyList();
 
-        for (int i = 0; i < allBalls.Count; i++)
+        if (myBalls.Count > 0)
         {
-            allBallsRbs.Add(allBalls[i].GetComponent<Rigidbody>());
+            SetBallToHand(myBalls[0]);
         }
+    }
 
-        numOfBalls = myBalls.Count;
-        if (numOfBalls > 0)
+    private void InitializeBallRigidbodyList()
+    {
+        foreach (GameObject ball in myBalls)
         {
-            ball = myBalls[ballNum];
-            ballRb = ball.GetComponent<Rigidbody>();
-            ball.transform.position = transform.position;
+            allBallsRbs.Add(ball.GetComponent<Rigidbody>());
         }
     }
 
     private void OnTriggerEnter(Collider obj)
     {
-        if (!ballsInHand.Contains(obj.gameObject) && obj.gameObject.CompareTag("Ball"))
+        if (obj.CompareTag("Ball") && !ballsInHand.Contains(obj.gameObject))
         {
-            ball = obj.gameObject;
-            int index = int.Parse(ball.name);
-            ballRb = allBallsRbs[index - 1];
-            catchPos = ball.transform.position;
-            ball.transform.position = transform.position;
-            ballsInHand.Enqueue(ball);
-            handMode = true;
+            CaptureBall(obj.gameObject);
 
-            if (catchingMode)
+            if (catchingMode && ballsInHand.Count == myBalls.Count)
             {
-                print("ssfsf: " + ballsInHand.Count);
+                catchingMode = false;
                 StopAllCoroutines();
-                if (ballsInHand.Count == myBalls.Count)
-                {
-                    catchingMode = false;
-                }
             }
         }
+    }
+
+    private void CaptureBall(GameObject capturedBall)
+    {
+        ballsInHand.Enqueue(capturedBall);
+        SetBallToHand(capturedBall);
+        handMode = true;
+    }
+
+    private void SetBallToHand(GameObject newBall)
+    {
+        ball = newBall;
+        ballRb = ball.GetComponent<Rigidbody>();
+        ball.transform.position = transform.position;
     }
 
     void Update()
     {
         if (ball != null)
         {
-            ballVelocity = ballRb.velocity;
+            ballRb.velocity = ballRb.velocity;
         }
 
         if (handMode)
         {
-            foreach (GameObject ballInHand in ballsInHand)
-            {
-                ballInHand.transform.position = transform.position;
-            }
+            PositionBallsInHand();
         }
 
-        if (PatternManager.userControlledMode && Input.GetKeyUp(releaseKey))
+        if (PatternManager.userControlledMode && Input.GetKeyUp(releaseKey) && ballsInHand.Count > 0)
         {
-            if (ballsInHand.Count > 0)
-            {
-                ReleaseSingleBall();
-            }
+            ReleaseSingleBall();
+        }
+    }
+
+    private void PositionBallsInHand()
+    {
+        foreach (GameObject ballInHand in ballsInHand)
+        {
+            ballInHand.transform.position = transform.position;
         }
     }
 
@@ -117,47 +103,45 @@ public class HandlingBall : MonoBehaviour
 
     private void ReleaseBall()
     {
-        if (ball == null) return; // Ensure ball is not null
+        if (ball == null) return;
 
-        float scale = ball.transform.position.y - basicPos.y;
-        float scaleZ = ball.transform.position.z - basicPos.z;
-        ball = ballsInHand.Dequeue();
-        ballRb = ball.GetComponent<Rigidbody>();
-        Vector3 fixedVector = new Vector3(properVector.x, properVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)), properVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ)));
-        ballRb.velocity = fixedVector;
+        Vector3 releaseVelocity = new Vector3(
+            properVector.x,
+            properVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)),
+            properVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ))
+        );
 
-        if (myBalls.Count - 1 > ballNum)
+        ballRb.velocity = releaseVelocity;
+        ballsInHand.Dequeue();
+        UpdateBallReference();
+
+        if (!PatternManager.userControlledMode)
         {
-            ballNum++;
-            ball = myBalls[ballNum];
-            int index = int.Parse(ball.name);
-            ballRb = allBallsRbs[index - 1];
+            StartCoroutine(BallRelease(patternTime));
+        }
+    }
+
+    private void UpdateBallReference()
+    {
+        if (ballsInHand.Count > 0)
+        {
+            SetBallToHand(ballsInHand.Peek());
         }
         else
         {
             handMode = false;
         }
-
-        if (!PatternManager.userControlledMode)
-        {
-            StartCoroutine(BallRelease(patternTime / (1 + scale + scaleZ)));
-        }
     }
 
     public IEnumerator BallRelease(float time)
     {
-        if (PatternManager.userControlledMode)
-        {
-            yield break; // Exit the coroutine if in user-controlled mode
-        }
-        else
-        {
-            yield return new WaitForSeconds(time);
-            if (basicPos == Vector3.zero)
-                basicPos = ball.transform.position;
-            else
-                previousPos = ball.transform.position;
-            ReleaseBall();
-        }
+        if (PatternManager.userControlledMode) yield break;
+
+        yield return new WaitForSeconds(time);
+
+        if (basicPos == Vector3.zero)
+            basicPos = ball.transform.position;
+
+        ReleaseBall();
     }
 }

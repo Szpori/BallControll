@@ -60,7 +60,7 @@ public class RotationPattern : MonoBehaviour
 
         if (throwMode)
         {
-            if (userControlledRotation)
+            if (!userControlledRotation)
             {
                 TimeRotation();
                 PerformAutomaticRotation(); // Perform the automatic rotation based on timing

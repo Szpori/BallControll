@@ -240,9 +240,6 @@ public class PatternManager : MonoBehaviour
                 rightHand.myBalls.Add(balls[i]);
                 rightHand.ballsInHand.Enqueue(balls[i]);
             }
-
-            leftHand.allBalls.Add(balls[i]);
-            rightHand.allBalls.Add(balls[i]);
         }
     }
 
