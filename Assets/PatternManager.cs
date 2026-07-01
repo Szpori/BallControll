@@ -233,12 +233,12 @@ public class PatternManager : MonoBehaviour
             if (i % 2 == 0)
             {
                 leftHand.myBalls.Add(balls[i]);
-                leftHand.ballsInHand.Enqueue(balls[i]);
+                leftHand.ballsInHand.Push(balls[i]);
             }
             else
             {
                 rightHand.myBalls.Add(balls[i]);
-                rightHand.ballsInHand.Enqueue(balls[i]);
+                rightHand.ballsInHand.Push(balls[i]);
             }
         }
     }

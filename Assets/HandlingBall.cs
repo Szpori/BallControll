@@ -5,7 +5,7 @@ using UnityEngine;
 public class HandlingBall : MonoBehaviour
 {
     public KeyCode releaseKey;
-    public Queue<GameObject> ballsInHand = new Queue<GameObject>();
+    public Stack<GameObject> ballsInHand = new Stack<GameObject>();
     public List<GameObject> myBalls = new List<GameObject>();
     public List<Rigidbody> allBallsRbs = new List<Rigidbody>();
     [SerializeField] GameObject ball;
@@ -35,7 +35,7 @@ void Start()
 
         if (myBalls.Count > 0)
         {
-            SetBallToHand(myBalls[0]);
+            SetBallToHand(ballsInHand.Peek());
         }
     }
 
@@ -63,7 +63,7 @@ void Start()
 
     private void CaptureBall(GameObject capturedBall)
     {
-        ballsInHand.Enqueue(capturedBall);
+        ballsInHand.Push(capturedBall);
         SetBallToHand(capturedBall);
         handMode = true;
     }
@@ -141,7 +141,7 @@ void Start()
         );
 
         ballRb.linearVelocity = releaseVelocity;
-        ballsInHand.Dequeue();
+        ballsInHand.Pop();
         UpdateBallReference();
 
         if (!PatternManager.userControlledMode)
