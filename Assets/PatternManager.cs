@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -79,7 +79,7 @@ public class PatternManager : MonoBehaviour
     [SerializeField] Vector3 basicVector;
     [SerializeField] Vector3 basicOddPatternVector = new Vector3(0f, 7.1f, 0.47f);
     // new Vector3(0f, 6.867f, 0.4642857f) wyliczone, new Vector3(0f, 7.1f, 0.47f) lepsze
-    [SerializeField] Vector3 basicEvenPatternVector = new Vector3(0f, 10.7f, -(0.09f));
+    [SerializeField] Vector3 basicEvenPatternVector = new Vector3(0f, 10.7f, -(0.08f));
     // new Vector3(0f, 10.3005f, -(0.11f / 1.05f)) wyliczone, new Vector3(0f, 10.7f, -(0.09f)) lepsze
     [SerializeField] float maxErrorZ = 0.05f;
     [SerializeField] float maxErrorY = 0.05f;
@@ -226,7 +226,7 @@ public class PatternManager : MonoBehaviour
 
     private void DistributeBalls()
     {
-        for (int i = 0; i < ballsInPattern; i++)
+        for (int i = 0; i < balls.Length; i++)
         {
             balls[i].gameObject.SetActive(true);
 

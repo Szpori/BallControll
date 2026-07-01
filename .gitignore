@@ -70,3 +70,22 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Generated metadata files
+*.meta
+
+# TextMesh Pro generated assets
+Assets/TextMesh Pro/
+
+# Screenshots (generated during testing)
+Assets/Screenshots/
+
+# Packages (auto-generated)
+Packages/com.coplaydev.unity-mcp/
+
+# Project settings files
+ProjectSettings/MultiplayerManager.asset
+ProjectSettings/PhysicsCoreProjectSettings2D.asset
+
+# Scene folders (auto-generated)
+Assets/Scenes/SampleScene/

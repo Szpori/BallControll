@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +20,15 @@ public class HandlingBall : MonoBehaviour
 
     Vector3 basicPos;
 
-    void Start()
+        private int currentThrowHeight = 3; // Siteswap throw height (3-7)
+
+    public void SetThrowHeight(int height)
+    {
+        if (height >= 3 && height <= 7)
+            currentThrowHeight = height;
+    }
+
+void Start()
     {
         releaseKey = (gameObject.name == "LeftHand") ? KeyCode.D : KeyCode.A;
         InitializeBallRigidbodyList();
@@ -71,12 +79,22 @@ public class HandlingBall : MonoBehaviour
     {
         if (ball != null)
         {
-            ballRb.velocity = ballRb.velocity;
+            ballRb.linearVelocity = ballRb.linearVelocity;
         }
 
         if (handMode)
         {
             PositionBallsInHand();
+        }
+
+        // Listen for numeric keys 3-7 to set throw height
+        for (int i = 3; i <= 7; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0 + i))
+            {
+                currentThrowHeight = i;
+                Debug.Log("Throw height set to: " + i);
+            }
         }
 
         if (PatternManager.userControlledMode && Input.GetKeyUp(releaseKey) && ballsInHand.Count > 0)
@@ -105,13 +123,24 @@ public class HandlingBall : MonoBehaviour
     {
         if (ball == null) return;
 
-        Vector3 releaseVelocity = new Vector3(
-            properVector.x,
-            properVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)),
-            properVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ))
+        // Scale Y for throw height, but inverse-scale X and Z to keep same landing distance
+        // Higher Y = longer flight time = ball travels further
+        // So we reduce X and Z to compensate
+        float heightFactor = currentThrowHeight / 3f;
+        
+        Vector3 scaledVector = new Vector3(
+            properVector.x / heightFactor,  // Reduce X (inverse scaling)
+            properVector.y * heightFactor,  // Increase Y (for height)
+            properVector.z / heightFactor   // Reduce Z (inverse scaling)
         );
 
-        ballRb.velocity = releaseVelocity;
+        Vector3 releaseVelocity = new Vector3(
+            scaledVector.x,
+            scaledVector.y * (1 + Random.Range(-maxErrorY, maxErrorY)),
+            scaledVector.z * (1 + Random.Range(-maxErrorZ, maxErrorZ))
+        );
+
+        ballRb.linearVelocity = releaseVelocity;
         ballsInHand.Dequeue();
         UpdateBallReference();
 
