@@ -2224,7 +2224,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numOfCollision: 0
   adjustSimulationSpeed: 1
-  simulationSpeed: 40
+  simulationSpeed: 30
   patternType: 
   cosScale: 3
   offset: 0
@@ -2256,6 +2256,7 @@ MonoBehaviour:
   - {fileID: 851848667}
   - {fileID: 1920657700}
   - {fileID: 843849447}
+  ballCount: 9
   leftSide: {fileID: 1577822844}
   rightSide: {fileID: 1186828143}
   leftHand: {fileID: 2091146062}

@@ -19,14 +19,7 @@ public class HandlingBall : MonoBehaviour
     public bool handMode = true;
 
     Vector3 basicPos;
-
-        private int currentThrowHeight = 3; // Siteswap throw height (3-7)
-
-    public void SetThrowHeight(int height)
-    {
-        if (height >= 3 && height <= 7)
-            currentThrowHeight = height;
-    }
+    private int currentThrowHeight = 3; // Siteswap height (3-7)
 
 void Start()
     {
@@ -37,13 +30,16 @@ void Start()
         {
             SetBallToHand(ballsInHand.Peek());
         }
+
+        // Initialize properVector based on currentThrowHeight (default 3)
+        UpdateThrowVectorBasedOnHeight();
     }
 
     private void InitializeBallRigidbodyList()
     {
-        foreach (GameObject ball in myBalls)
+        foreach (GameObject b in myBalls)
         {
-            allBallsRbs.Add(ball.GetComponent<Rigidbody>());
+            allBallsRbs.Add(b.GetComponent<Rigidbody>());
         }
     }
 
@@ -88,12 +84,13 @@ void Start()
         }
 
         // Listen for numeric keys 3-7 to set throw height
-        for (int i = 3; i <= 7; i++)
+        for (int i = 3; i <= 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha0 + i))
             {
                 currentThrowHeight = i;
-                Debug.Log("Throw height set to: " + i);
+                UpdateThrowVectorBasedOnHeight();
+                Debug.Log($"Throw height set to: {i}");
             }
         }
 
@@ -123,15 +120,12 @@ void Start()
     {
         if (ball == null) return;
 
-        // Scale Y for throw height, but inverse-scale X and Z to keep same landing distance
-        // Higher Y = longer flight time = ball travels further
-        // So we reduce X and Z to compensate
         float heightFactor = currentThrowHeight / 3f;
-        
+
         Vector3 scaledVector = new Vector3(
-            properVector.x / heightFactor,  // Reduce X (inverse scaling)
-            properVector.y * heightFactor,  // Increase Y (for height)
-            properVector.z / heightFactor   // Reduce Z (inverse scaling)
+            properVector.x / heightFactor,
+            properVector.y * heightFactor,
+            properVector.z / heightFactor
         );
 
         Vector3 releaseVelocity = new Vector3(
@@ -172,5 +166,27 @@ void Start()
             basicPos = ball.transform.position;
 
         ReleaseBall();
+    }
+
+private void UpdateThrowVectorBasedOnHeight()
+    {
+        // In siteswap: even heights (4,6) throw to same hand, odd heights (3,5,7) throw to other hand
+        bool isEvenThrowHeight = currentThrowHeight % 2 == 0;
+        
+        Vector3 baseVector;
+        if (isEvenThrowHeight)
+        {
+            // Even: lower Y, maintain Z proportion (0.08 scaled down)
+            baseVector = new Vector3(0, 2f, -0.41f);
+        }
+        else
+        {
+            // Odd: lower Y, maintain Z proportion (0.47 scaled down) 
+            baseVector = new Vector3(0, 1.9f, 1.65f);
+        }
+        
+        // Mirror Z for right hand so both hands throw towards each other
+        bool isLeftHand = gameObject.name.Contains("Left");
+        properVector = isLeftHand ? baseVector : new Vector3(baseVector.x, baseVector.y, -baseVector.z);
     }
 }
